@@ -23,7 +23,7 @@ class DBLoader(object):
         self.data_dir = data_dir
         self.gt_file = os.path.join(self.data_dir, 'groundtruth.txt')
         self.curr_idx = 0
-        self.im_paths = glob.glob(os.path.join(self.data_dir, 'color/*.jpg'))
+        self.im_paths = glob.glob(os.path.join(self.data_dir, 'img/*.jpg'))
         self.im_paths.sort()
         self.init_box = self.get_init_box()
 
@@ -157,14 +157,16 @@ def demo(base_path, ar_path, data_dir):
 
 if __name__ == '__main__':
     # path to video sequence - any directory with series of images will be OK
-    data_dir = 'data/RGBD19/box_room_occ_1'
+    data_dir = 'airplane-1'
 
     # path to model_file of base tracker - model can be download from:
     # https://drive.google.com/open?id=1qDptswis2FxihLRYLVRGDvx6aUoAVVLv
-    base_path = '/home/zxy/Desktop/AR_Maintaince/AlphaRefine/pytracking/networks/super_dimp.pth.tar'
+    base_path = 'super_dimp.pth.tar'
 
     # path to model_file of Alpha-Refine - the model can be download from
     # https://drive.google.com/file/d/1drLqNq4r9g4ZqGtOGuuLCmHJDh20Fu1m/view
-    ar_path = '/home/zxy/Desktop/AR_Maintaince/AlphaRefine/ltr/checkpoints/ltr/SEx_beta/SEcmnet_ep0040-c.pth.tar'
+    ar_path = 'SEcmnet_ep0040-c.pth.tar'
 
     demo(base_path, ar_path, data_dir)
+
+   
