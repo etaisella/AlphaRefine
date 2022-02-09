@@ -19,7 +19,8 @@ torch.set_num_threads(1)
 
 class DBLoader(object):
     """ Debug Data Loader """
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, manual_roi = False):
+        self.manual_roi = manual_roi
         self.data_dir = data_dir
         self.gt_file = os.path.join(self.data_dir, 'groundtruth.txt')
         self.curr_idx = 0
@@ -27,11 +28,22 @@ class DBLoader(object):
         self.im_paths.sort()
         self.init_box = self.get_init_box()
 
+
     def get_init_box(self):
-        im_path = self.im_paths[0]
-        first_frame = cv2.imread(im_path)
-        init_box = cv2.selectROI(os.path.basename(self.data_dir), first_frame, False, False)
-        return np.array(init_box)
+        if self.manual_roi == True:
+            im_path = self.im_paths[0]
+            first_frame = cv2.imread(im_path)
+            init_box = cv2.selectROI(os.path.basename(self.data_dir), first_frame, False, False)
+            return np.array(init_box)
+        else:
+            file = open(self.gt_file, "r")
+            gt_lines = file.readlines()
+            file.close()
+            roi = gt_lines[0].rstrip().split(',')
+            roi = [int(item) for item in roi]
+            return np.array(roi)
+
+
 
     def region(self):
         return self.init_box
@@ -126,10 +138,10 @@ def demo(base_path, ar_path, data_dir):
         """ Step 2: base tracker prediction """
         # track with base tracker
         outputs = tracker.track(img)
-        pred_bbox = outputs['target_bbox']
+        pred_bbox_orig = outputs['target_bbox']
 
         """ Step 3: refine tracking results with Alpha-Refine """
-        pred_bbox = RF_module.refine(img, np.array(pred_bbox))
+        pred_bbox = RF_module.refine(img, np.array(pred_bbox_orig))
 
         """ Step 4: update base tracker's state with refined result """
         x1, y1, w, h = pred_bbox.tolist()
@@ -146,9 +158,12 @@ def demo(base_path, ar_path, data_dir):
 
         # visualization
         pred_bbox = list(map(int, pred_bbox))
+        pred_bbox_orig = list(map(int, pred_bbox_orig))
         _img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.rectangle(_img, (pred_bbox[0], pred_bbox[1]),
-                      (pred_bbox[0] + pred_bbox[2], pred_bbox[1] + pred_bbox[3]), (0, 255, 255), 3)
+                      (pred_bbox[0] + pred_bbox[2], pred_bbox[1] + pred_bbox[3]), (0, 0, 255), 2)
+        cv2.rectangle(_img, (pred_bbox_orig[0], pred_bbox_orig[1]),
+                     (pred_bbox_orig[0] + pred_bbox_orig[2], pred_bbox_orig[1] + pred_bbox_orig[3]), (255, 0, 0), 2)
         cv2.imshow('', _img)
         key = cv2.waitKey(1)
         if key == ord('q'):
