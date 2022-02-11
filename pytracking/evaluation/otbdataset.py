@@ -39,7 +39,8 @@ class OTBDataset(BaseDataset):
         anno_path = '{}/{}'.format(self.base_path, sequence_info['anno_path'])
 
         # NOTE: OTB has some weird annos which panda cannot handle
-        ground_truth_rect = load_text(str(anno_path), delimiter=(',', None), dtype=np.float64, backend='numpy')
+
+        ground_truth_rect = load_text(sequence_info['anno_path'], delimiter=(',', None), dtype=np.float64, backend='numpy')
 
         return Sequence(sequence_info['name'], frames, 'otb', ground_truth_rect[init_omit:,:],
                         object_class=sequence_info['object_class'])
@@ -49,7 +50,7 @@ class OTBDataset(BaseDataset):
 
     def _get_sequence_info_list(self):
         sequence_info_list = [
-            {"name": "Basketball", "path": "Basketball/img", "startFrame": 1, "endFrame": 725, "nz": 4, "ext": "jpg", "anno_path": "Basketball/groundtruth_rect.txt",
+            {"name": "Basketball", "path": u"./Basketball/img", "startFrame": 1, "endFrame": 725, "nz": 4, "ext": "jpg", "anno_path": u"./Basketball/groundtruth_rect.txt",
              "object_class": "person"}
         ]
         '''
