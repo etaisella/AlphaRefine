@@ -275,6 +275,7 @@ def plot_results(trackers, dataset, report_name, merge_results=False,
                        norm_precision_plot_opts)
 
     plt.show()
+    return eval_data
 
 
 def generate_formatted_report(row_labels, scores, table_name=''):

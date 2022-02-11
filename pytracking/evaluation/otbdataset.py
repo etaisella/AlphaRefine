@@ -33,7 +33,7 @@ class OTBDataset(BaseDataset):
         if 'initOmit' in sequence_info:
             init_omit = sequence_info['initOmit']
 
-        frames = ['{base_path}/{sequence_path}/{frame:0{nz}}.{ext}'.format(base_path=self.base_path, 
+        frames = ['{sequence_path}/{frame:0{nz}}.{ext}'.format(base_path=self.base_path,
         sequence_path=sequence_path, frame=frame_num, nz=nz, ext=ext) for frame_num in range(start_frame+init_omit, end_frame+1)]
 
         anno_path = '{}/{}'.format(self.base_path, sequence_info['anno_path'])
