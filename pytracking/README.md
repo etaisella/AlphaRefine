@@ -16,6 +16,7 @@ A general python library for visual tracking algorithms.
 * [Visdom](#visdom)
 * [VOT Integration](#vot-integration)
 * [Integrating a new tracker](#integrating-a-new-tracker)
+* [Etai & Or additions](#etai-and-or-additions)
 
 
 ## Running a tracker
@@ -176,5 +177,12 @@ Here, ```TrackerClass``` is the name of your tracker class. See the [file for Di
 
 Next, you need to create a folder "parameter/your_tracker_name", where the parameter settings for the tracker should be stored. The parameter file shall contain a ```parameters()``` function that returns a ```TrackerParams``` struct. See the [default parameter file for DiMP](parameter/dimp/dimp50.py) as an example.
 
- 
+ ### Etai and Or additions
+  As part of our final project for the DL course at TAU we have added a fiew scripts to help us analyze and evaluate results:
+  
+ ## run_refinement.py
+  Runs refinement on a set of tracker results.
+  
+  Run python run_refinement.py -h for usage info.
+  
  
