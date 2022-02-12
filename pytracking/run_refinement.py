@@ -19,20 +19,6 @@ from pytracking.evaluation import get_dataset
 from pytracking.evaluation.running import run_dataset
 from pytracking.evaluation import Tracker
 
-
-def get_ground_truth(dataset_name, sequence):
-    if dataset_name == 'otb':
-        if sequence == 'Basketball':
-            gt_path = os.path.join(sequence, 'groundtruth_rect.txt')
-        else:
-            raise ValueError('Unsupported Sequence!')
-    else:
-        raise ValueError('Unsupported Dataset!')
-
-    gt = np.loadtxt(gt_path, dtype=np.float, delimiter=',')
-    return gt[0]
-
-
 def run_refinement(tracker_name, tracker_param, dataset_name='otb', sequence=None, refined_path='refined'):
     """Run evaluator on sequence or dataset.
     args:

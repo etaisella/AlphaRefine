@@ -8,6 +8,7 @@ pytracking/pytracking.egg-info/
 pytracking/pytracking
 pytracking/result_plots/
 pytracking/tracking_results/
+pytracking/visualizer_results/
 *.egg*
 *.pyc
 tensorboard/
