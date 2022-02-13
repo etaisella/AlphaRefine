@@ -110,6 +110,7 @@ class kb_tracker(BaseTracker):
         init_box = info['init_bbox']
         s_initial = np.array([init_box[0] + int(init_box[2] / 2), init_box[1] + int(init_box[3] / 2),
                               int(init_box[2] / 2), int(init_box[3] / 2), 0, 0])
+
         self.S = self.predictParticles(mb.repmat(s_initial, 1, N).reshape((6, N), order='F'))
 
         # initialize histogram and weights
@@ -141,10 +142,17 @@ class kb_tracker(BaseTracker):
         Y_mean = np.sum(np.multiply(self.W, self.S[1, :]))
         width_mean = np.sum(np.multiply(self.W, self.S[2, :]))
         height_mean = np.sum(np.multiply(self.W, self.S[3, :]))
-        output_state = [X_mean - width_mean * 2, Y_mean - height_mean + 2, width_mean * 2, height_mean + 2]
+        output_state = [X_mean - width_mean, Y_mean - height_mean, width_mean * 2, height_mean * 2]
         out = {'target_bbox': output_state}
 
         self.images_processed += 1
+
+        # update gt
+        if self.images_processed % self.params.gt_update_interval == 0:
+            updated_q = self.q + compNormHist(image, np.array([X_mean, Y_mean, width_mean, height_mean]))
+            norm = np.linalg.norm(updated_q)
+            self.q = updated_q / norm
+
         return out
 
 
