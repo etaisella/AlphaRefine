@@ -19,7 +19,7 @@ from pytracking.evaluation import get_dataset
 from pytracking.evaluation.running import run_dataset
 from pytracking.evaluation import Tracker
 
-def run_refinement(tracker_name, tracker_param, dataset_name='otb', sequence=None, refined_path='refined'):
+def run_refinement(tracker_name, tracker_param, dataset_name='otb', sequence='Basketball', refined_path='refined'):
     """Run evaluator on sequence or dataset.
     args:
         tracker_name: Name of tracking method.
@@ -69,7 +69,7 @@ def main():
     parser.add_argument('tracker_name', type=str, help='Name of tracking method.')
     parser.add_argument('tracker_param', type=str, help='Name of parameter file.')
     parser.add_argument('--dataset_name', type=str, default='otb', help='Name of dataset (otb, nfs, uav, tpl, vot, tn, gott, gotv, lasot).')
-    parser.add_argument('--sequence', type=str, default=None, help='Sequence number or name.')
+    parser.add_argument('--sequence', type=str, default='Basketball', help='Sequence number or name.')
     parser.add_argument('--refined_path', type=str, default="refined", help='Refined folder name')
 
     args = parser.parse_args()
