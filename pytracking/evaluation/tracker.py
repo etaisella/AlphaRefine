@@ -217,6 +217,8 @@ class Tracker:
             prev_output = OrderedDict(out)
             _store_outputs(out, {'time': time.time() - start_time})
 
+            print(frame_num)
+
             segmentation = out['segmentation'] if 'segmentation' in out else None
             if self.visdom is not None:
                 tracker.visdom_draw_tracking(image, out['target_bbox'], segmentation)
