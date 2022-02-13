@@ -56,6 +56,9 @@ def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
     for i, frame in enumerate(dataset[0].frames):
         img = cv2.imread(frame)
 
+        cv2.rectangle(img, (0, 0), (400, 100), (0, 0, 0), thickness=-1)
+        cv2.rectangle(img, (0, 0), (400, 100), (255, 255, 255), thickness=1)
+
         # visualize ground truth
         gt_bbox = list(map(int, dataset[0].ground_truth_rect[i]))
         cv2.rectangle(img, (gt_bbox[0], gt_bbox[1]),
@@ -66,14 +69,14 @@ def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
         tracker_bbox = list(map(int, track_result[i]))
         cv2.rectangle(img, (tracker_bbox[0], tracker_bbox[1]),
                       (tracker_bbox[0] + tracker_bbox[2], tracker_bbox[1] + tracker_bbox[3]), (0, 0, 255), 2)
-        cv2.putText(img, 'Original Tracker', (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
+        cv2.putText(img, tracker_name + ' Tracker', (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
 
         # if refined path exists add refined results to video
         if refined_path != None:
             refined_bbox = list(map(int, refined_result[i]))
             cv2.rectangle(img, (refined_bbox[0], refined_bbox[1]),
                           (refined_bbox[0] + refined_bbox[2], refined_bbox[1] + refined_bbox[3]), (255, 0, 0), 2)
-            cv2.putText(img, 'Refined Tracker', (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), thickness=2)
+            cv2.putText(img, 'Refined ' + tracker_name + ' Tracker', (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), thickness=2)
 
 
         result_clip.append(img)
