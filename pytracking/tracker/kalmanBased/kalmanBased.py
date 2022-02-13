@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import time
-from numba import jit
+from fast_histogram import histogram1d
 
 
 def compNormHist(I, S):
@@ -29,9 +29,10 @@ def compNormHist(I, S):
                              256 * normalised_window[:, :, 2]
 
     # create histogram
-    q_test = np.histogram(normalized_window_gray, np.arange(4096), density=True)
+    q_test = histogram1d(normalized_window_gray.flat, bins=4096, range=(0, 4096))
+    q_test = q_test / np.sum(q_test)
 
-    return q_test[0]
+    return q_test
 
 
 def compBatDist(p, q):
@@ -45,7 +46,6 @@ def calculateW(I, S, q):
     W = np.zeros((1, N))
 
     # calculate weights
-    # p = compNormHist(I, S[:, i])
 
     X_boundry = I.shape[1] - 1
     Y_boundry = I.shape[0] - 1
@@ -56,7 +56,7 @@ def calculateW(I, S, q):
     left_boundry = np.clip(S[0] - S[2], 0, X_boundry - 1).astype(int)
     right_boundry = np.clip(S[0] + S[2], 1, X_boundry).astype(int)
 
-    p = np.zeros((N, 4095))
+    p = np.zeros((N, 4096))
     for i in range(N):
         normalised_window = I[bottom_boundry[i]:top_boundry[i],
                             left_boundry[i]:right_boundry[i],
@@ -67,8 +67,9 @@ def calculateW(I, S, q):
                                  256 * normalised_window[:, :, 2]
 
         # create histogram
-        q_test = np.histogram(normalized_window_gray, np.arange(4096), density=True)
-        p[i] = q_test[0]
+        q_test = histogram1d(normalized_window_gray.flat, bins=4096, range=(0, 4096))
+        q_test = q_test / np.sum(q_test)
+        p[i] = q_test
 
     sigma_part = np.sum(np.sqrt(p * q), axis=1) * 10
     # distance = compBatDist(p, q)
