@@ -95,6 +95,13 @@ echo ""
 echo "****************** Installing jpeg4py python wrapper ******************"
 pip install jpeg4py 
 
+
+echo ""
+echo ""
+echo "****************** Installing fast histogram ******************"
+pip install fast-histogram 
+
+
 echo ""
 echo ""
 echo "****************** Installing ninja-build to compile PreROIPooling ******************"
