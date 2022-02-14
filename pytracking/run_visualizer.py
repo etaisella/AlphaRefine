@@ -4,7 +4,7 @@ import argparse
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-plt.rcParams['figure.figsize'] = [14, 8]
+#plt.rcParams['figure.figsize'] = [14, 8]
 
 from pytracking.evaluation import Tracker, get_dataset, trackerlist
 
@@ -51,6 +51,10 @@ def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
 
     # get dataset
     dataset = get_dataset(dataset_name)
+    data_sequence = None
+    for seq in dataset:
+        if seq.name == sequence:
+            data_sequence = seq
 
     result_clip = []
 
@@ -59,14 +63,14 @@ def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
     else:
         text_scale = 1
 
-    for i, frame in enumerate(dataset[0].frames):
+    for i, frame in enumerate(data_sequence.frames):
         img = cv2.imread(frame)
 
         cv2.rectangle(img, (0, 0), (400, 100), (0, 0, 0), thickness=-1)
         cv2.rectangle(img, (0, 0), (400, 100), (255, 255, 255), thickness=1)
 
         # visualize ground truth
-        gt_bbox = list(map(int, dataset[0].ground_truth_rect[i]))
+        gt_bbox = list(map(int, data_sequence.ground_truth_rect[i]))
         cv2.rectangle(img, (gt_bbox[0], gt_bbox[1]),
                       (gt_bbox[0] + gt_bbox[2], gt_bbox[1] + gt_bbox[3]), (0, 255, 255), 2)
         cv2.putText(img, 'Ground Truth', (20, 30), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (0, 255, 255), thickness=2)
@@ -93,10 +97,10 @@ def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
         os.makedirs(visualizer_dir)
     result_path = os.path.join(visualizer_dir, sequence + ".avi")
     H, W, _ = img.shape
-    out = cv2.VideoWriter(result_path, cv2.VideoWriter_fourcc(*'XVID'), 20, (H, W))
+    out = cv2.VideoWriter(result_path, cv2.VideoWriter_fourcc(*'XVID'), 20, (W, H))
 
     for img in result_clip:
-        img = cv2.resize(img, (H, W))
+        img = cv2.resize(img, (W, H))
         '''
         cv2.imshow('', img)
         key = cv2.waitKey(1)

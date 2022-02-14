@@ -41,7 +41,15 @@ def run_refinement(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
 
     # get dataset and groundtruth
     dataset = get_dataset(dataset_name)
-    gt = dataset[0].ground_truth_rect[0]
+    data_sequence = None
+    for seq in dataset:
+        if seq.name == sequence:
+            data_sequence = seq
+
+    if data_sequence == None:
+        raise ValueError("Bad sequence name received, or none given!")
+
+    gt = data_sequence.ground_truth_rect[0]
     first_image = cv2.cvtColor(cv2.imread(dataset[0].frames[0]), cv2.COLOR_BGR2RGB)
 
     # initialize refinement model
@@ -49,7 +57,7 @@ def run_refinement(tracker_name, tracker_param, dataset_name='otb', sequence='Ba
 
     refined_results = np.zeros_like(track_result)
 
-    for i, frame in enumerate(dataset[0].frames):
+    for i, frame in enumerate(data_sequence.frames):
         init_res = track_result[i]
         img = cv2.cvtColor(cv2.imread(frame), cv2.COLOR_BGR2RGB)
         out_dict = RF_module.refine(img, init_res, mode='all', test=True)
