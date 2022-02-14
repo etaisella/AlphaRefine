@@ -34,6 +34,13 @@ def run_evaluator(tracker_name, tracker_param, dataset_name='otb', sequence=None
         trackers.extend(trackerlist(tracker_name, os.path.join(tracker_param, "refined"), range(0, 5), tracker_param + "_with_refined"))
 
     dataset = get_dataset(dataset_name)
+
+    if sequence != None:
+        for seq in dataset:
+            if seq.name == sequence:
+                dataset = seq
+                dataset_name = dataset_name + '_' + seq.name
+
     eval_data = plot_results(trackers, dataset, dataset_name + refined_path, merge_results=True, plot_types=('success', 'prec'),
                  skip_missing_seq=False, force_evaluation=True, plot_bin_gap=0.05, exclude_invalid_frames=False)
 

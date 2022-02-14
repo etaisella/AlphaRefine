@@ -114,15 +114,20 @@ def extract_results(trackers, dataset, report_name, skip_missing_seq=False, plot
     threshold_set_center = torch.arange(0, 51, dtype=torch.float64)
     threshold_set_center_norm = torch.arange(0, 51, dtype=torch.float64) / 100.0
 
-    avg_overlap_all = torch.zeros((len(dataset), len(trackers)), dtype=torch.float64)
-    ave_success_rate_plot_overlap = torch.zeros((len(dataset), len(trackers), threshold_set_overlap.numel()),
+    try:
+        dataset_length = len(dataset)
+    except:
+        dataset_length = 1 # running on a sequence
+
+    avg_overlap_all = torch.zeros((dataset_length, len(trackers)), dtype=torch.float64)
+    ave_success_rate_plot_overlap = torch.zeros((dataset_length, len(trackers), threshold_set_overlap.numel()),
                                                 dtype=torch.float32)
-    ave_success_rate_plot_center = torch.zeros((len(dataset), len(trackers), threshold_set_center.numel()),
+    ave_success_rate_plot_center = torch.zeros((dataset_length, len(trackers), threshold_set_center.numel()),
                                                dtype=torch.float32)
-    ave_success_rate_plot_center_norm = torch.zeros((len(dataset), len(trackers), threshold_set_center.numel()),
+    ave_success_rate_plot_center_norm = torch.zeros((dataset_length, len(trackers), threshold_set_center.numel()),
                                                     dtype=torch.float32)
 
-    valid_sequence = torch.ones(len(dataset), dtype=torch.uint8)
+    valid_sequence = torch.ones(dataset_length, dtype=torch.uint8)
 
     for seq_id, seq in enumerate(tqdm(dataset)):
         # Load anno

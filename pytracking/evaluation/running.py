@@ -87,9 +87,9 @@ def run_sequence(seq: Sequence, tracker: Tracker, debug=False, visdom_info=None)
 
     visdom_info = {} if visdom_info is None else visdom_info
 
-    if _results_exist() and not debug:
-        print('FPS: {}'.format(-1))
-        return
+    #if _results_exist() and not debug:
+    #    print('FPS: {}'.format(-1))
+    #    return
 
     print('Tracker: {} {} {} ,  Sequence: {}'.format(tracker.name, tracker.parameter_name, tracker.run_id, seq.name))
 
