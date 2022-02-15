@@ -150,7 +150,9 @@ class kb_tracker(BaseTracker):
 
         # update gt
         if self.images_processed % self.params.gt_update_interval == 0:
-            updated_q = self.q + compNormHist(image, np.array([X_mean, Y_mean, width_mean, height_mean]))
+            curr_state_histo = compNormHist(image, np.array([X_mean, Y_mean, width_mean, height_mean]))
+            weight = (compBatDist(self.q, curr_state_histo) / compBatDist(1, 1))
+            updated_q = self.q + weight * curr_state_histo
             norm = np.linalg.norm(updated_q)
             self.q = updated_q / norm
 

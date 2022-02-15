@@ -30,7 +30,7 @@ def get_ground_truth(dataset_name, sequence):
     return gt[0]
 
 
-def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Basketball', refined_path=None, run_id=None):
+def run_visualizer(tracker_name, tracker_param, dataset_name='otb', sequence='Basketball', refined_path=None, show_gui=1):
     """Run evaluator on sequence or dataset.
     args:
         tracker_name: Name of tracking method.
@@ -120,7 +120,7 @@ def main():
     parser.add_argument('--dataset_name', type=str, default='otb', help='Name of dataset (otb, nfs, uav, tpl, vot, tn, gott, gotv, lasot).')
     parser.add_argument('--sequence', type=str, default='Basketball', help='Sequence number or name.')
     parser.add_argument('--refined_path', type=str, default=None, help='Refined folder name')
-    parser.add_argument('--run_id', type=int, default=None, help='Run ID')
+    parser.add_argument('--show_gui', type=int, default=1, help='Run ID')
 
 
     args = parser.parse_args()
@@ -130,7 +130,7 @@ def main():
     except:
         seq_name = args.sequence
 
-    run_visualizer(args.tracker_name, args.tracker_param, args.dataset_name, seq_name, args.refined_path, args.run_id)
+    run_visualizer(args.tracker_name, args.tracker_param, args.dataset_name, seq_name, args.refined_path, args.show_gui)
 
 
 if __name__ == '__main__':

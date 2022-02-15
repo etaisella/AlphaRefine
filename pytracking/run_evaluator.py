@@ -28,10 +28,22 @@ def run_evaluator(tracker_name, tracker_param, dataset_name='otb', sequence=None
     """
     trackers = []
 
-    trackers.extend(trackerlist(tracker_name, tracker_param, range(0,5), tracker_param))
+    if tracker_name == 'all':
+        trackers.extend(trackerlist('kalmanBased', 'standard', range(0, 5), 'kalmanBased_standard'))
+        trackers.extend(trackerlist('atom', 'default', range(0, 5), 'atom_default'))
+        trackers.extend(trackerlist('dimp', 'super_dimp', range(0, 5), 'super_dimp'))
+        if refined_path != None:
+            trackers.extend(trackerlist('kalmanBased', os.path.join('standard', "refined"), range(0, 5),
+                                        'kalmanBased_standard' + "_with_refined"))
+            trackers.extend(trackerlist('atom', os.path.join('default', "refined"), range(0, 5),
+                                        'atom_default' + "_with_refined"))
+            trackers.extend(trackerlist('dimp', os.path.join('super_dimp', "refined"), range(0, 5),
+                                        'super_dimp' + "_with_refined"))
+    else:
+        trackers.extend(trackerlist(tracker_name, tracker_param, range(0,5), tracker_param))
 
-    if refined_path != None:
-        trackers.extend(trackerlist(tracker_name, os.path.join(tracker_param, "refined"), range(0, 5), tracker_param + "_with_refined"))
+        if refined_path != None:
+            trackers.extend(trackerlist(tracker_name, os.path.join(tracker_param, "refined"), range(0, 5), tracker_param + "_with_refined"))
 
     dataset = get_dataset(dataset_name)
 
