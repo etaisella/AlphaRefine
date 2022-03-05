@@ -12,3 +12,5 @@ pytracking/visualizer_results/
 *.egg*
 *.pyc
 tensorboard/
+pytracking/tracker/kalmanBased/qatm/data
+pytracking/tracker/kalmanBased/qatm/data_validation

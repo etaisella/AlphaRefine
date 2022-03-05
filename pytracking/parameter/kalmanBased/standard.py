@@ -11,6 +11,6 @@ def parameters():
     params.y_box_rand_scale = 1.25
     params.min_box_width = 5
     params.min_box_height = 5
-    params.gt_update_interval = 100
+    params.gt_update_interval = 1000
 
     return params

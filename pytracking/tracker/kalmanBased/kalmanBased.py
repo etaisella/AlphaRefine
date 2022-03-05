@@ -8,7 +8,14 @@ import matplotlib.patches as patches
 import os
 import time
 from fast_histogram import histogram1d
-
+from PIL import Image
+import torch
+from torchvision import models, transforms, utils
+import sys
+sys.path
+sys.path.append('./qatm/')
+from tracker.kalmanBased.qatm.qatm import TrackerModel
+print(sys.path)
 
 def compNormHist(I, S):
     X_boundry = I.shape[1] - 1
@@ -41,7 +48,7 @@ def compBatDist(p, q):
 
 
 
-def calculateW(I, S, q):
+def calculateW(I, S, q, centerPoint):
     N = S.shape[1]
     W = np.zeros((1, N))
 
@@ -76,8 +83,23 @@ def calculateW(I, S, q):
     W[0] = np.exp(sigma_part)
 
     # normalise
-
     W = W / np.sum(W)
+
+    cp_particles = [S[0], S[1]]
+    cp_estimated = centerPoint
+    dist = (cp_particles[0] - cp_estimated[0])**2 + (cp_particles[1] - cp_estimated[1])**2
+
+    beta = 1.0
+    W2 = np.amax(dist) - dist
+    if np.amin(dist) > 20:
+        print("Distance too big")
+        beta = 0
+
+    W2 = W2 / np.sum(W2)
+
+    W = W + W2 * beta
+    W = W / np.sum(W)
+
     return W
 
 class kb_tracker(BaseTracker):
@@ -103,8 +125,22 @@ class kb_tracker(BaseTracker):
         S_tag[:, np.arange(N)] = S[:, draw]
         return S_tag
 
+    def setTemplateFromImage(self, image, bbox):
+        template_raw = Image.fromarray(image)
+        template_tensor = transforms.functional.crop(template_raw,
+                                                     int(bbox[1]),
+                                                     int(bbox[0]),
+                                                     int(bbox[3]),
+                                                     int(bbox[2]))
+        template_tensor = self.transform(template_tensor)
+        self.template = template_tensor
 
     def initialize(self, image, info: dict) -> dict:
+        self.transform = self.transform = transforms.Compose([transforms.ToTensor(),
+                                                              transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                                                   std=[0.229, 0.224, 0.225],)
+                                                              ])
+
         N = self.params.num_particles
 
         # initialize particles
@@ -114,11 +150,21 @@ class kb_tracker(BaseTracker):
 
         self.S = self.predictParticles(mb.repmat(s_initial, 1, N).reshape((6, N), order='F'))
 
+        # init qatm model and template
+        self.setTemplateFromImage(image, init_box)
+        self.qatm_model = TrackerModel(model=models.vgg19(pretrained=True).features, use_cuda=True)
+        self.qatm_model.load_state_dict(torch.load("tracker/kalmanBased/qatm/model_files/model.pth"))
+        self.qatm_model.set_template(torch.unsqueeze(self.template, dim=0))
+        self.qatm_model.eval()
+
         # initialize histogram and weights
         self.q = compNormHist(image, s_initial)
-        self.W = calculateW(image, self.S, self.q)
+        self.W = calculateW(image, self.S, self.q, [init_box[0] + int(init_box[2] / 2), init_box[1] + int(init_box[3] / 2)])
 
         self.images_processed = 1
+
+        f = open("centerPoint.txt", "w")
+        f.close()
 
         # Time initialization
         tic = time.time()
@@ -135,8 +181,13 @@ class kb_tracker(BaseTracker):
         # predinct next particles
         self.S = self.predictParticles(S_next_tag)
 
+        # get center point
+        image_tensor = self.transform(image)
+        _, center_point = self.qatm_model(torch.unsqueeze(image_tensor, dim=0))
+        center_point = np.array(center_point.detach().cpu().squeeze()).astype(int)
+
         # compute particle weights
-        self.W = calculateW(image, self.S, self.q)
+        self.W = calculateW(image, self.S, self.q, center_point)
 
         # return agrragated particle
         X_mean = np.sum(np.multiply(self.W, self.S[0, :]))
@@ -145,6 +196,11 @@ class kb_tracker(BaseTracker):
         height_mean = np.sum(np.multiply(self.W, self.S[3, :]))
         output_state = [X_mean - width_mean, Y_mean - height_mean, width_mean * 2, height_mean * 2]
         out = {'target_bbox': output_state}
+
+        # open cp file (delete later)
+        f = open("centerPoint.txt", "a")
+        f.write("%f %f \n" % (center_point[0], center_point[1]))
+        f.close()
 
         self.images_processed += 1
 
