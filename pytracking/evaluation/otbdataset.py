@@ -58,7 +58,9 @@ class OTBDataset(BaseDataset):
              "object_class": "bird"},
             {"name": "Dog", "path": "Dog/img", "startFrame": 1, "endFrame": 127, "nz": 4, "ext": "jpg",
              "anno_path": "Dog/groundtruth_rect.txt",
-             "object_class": "dog"}
+             "object_class": "dog"},
+            {"name": "Woman", "path": "Woman/img", "startFrame": 1, "endFrame": 597, "nz": 4, "ext": "jpg", "anno_path": "Woman/groundtruth_rect.txt",
+             "object_class": "person"}
         ]
 
         '''
