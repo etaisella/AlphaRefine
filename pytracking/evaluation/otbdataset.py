@@ -50,13 +50,8 @@ class OTBDataset(BaseDataset):
 
     def _get_sequence_info_list(self):
         sequence_info_list = [
-            {"name": "Basketball", "path": u"./Basketball/img", "startFrame": 1, "endFrame": 725, "nz": 4, "ext": "jpg",
-             "anno_path": u"./Basketball/groundtruth_rect.txt",
-             "object_class": "person"},
-            {"name": "Vase", "path": "Vase/img", "startFrame": 1, "endFrame": 271, "nz": 4, "ext": "jpg", "anno_path": "Vase/groundtruth_rect.txt",
-             "object_class": "other"},
-            {"name": "Singer1", "path": "Singer1/img", "startFrame": 1, "endFrame": 351, "nz": 4, "ext": "jpg", "anno_path": "Singer1/groundtruth_rect.txt",
-             "object_class": "person"}
+            {"name": "Dog", "path": "Dog/img", "startFrame": 1, "endFrame": 127, "nz": 4, "ext": "jpg", "anno_path": "Dog/groundtruth_rect.txt",
+             "object_class": "dog"}
         ]
 
         '''
