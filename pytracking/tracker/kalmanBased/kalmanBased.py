@@ -128,7 +128,7 @@ class kb_tracker(BaseTracker):
 
         W2 = W2 / np.sum(W2)
 
-        W = W + W2 * self.params.lambda
+        W = W + W2 * self.params.lambda_param
         W = W / np.sum(W)
 
         return W
