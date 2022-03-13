@@ -12,6 +12,6 @@ def parameters():
     params.min_box_width = 5
     params.min_box_height = 5
     params.gt_update_interval = 1000
-    params.lambda = 1.75
+    params.lambda_param = 1.75
 
     return params
