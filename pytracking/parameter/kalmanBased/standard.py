@@ -7,11 +7,11 @@ def parameters():
     params.num_particles = 140
     params.x_rand_scale = 1.25
     params.y_rand_scale = 1.25
-    params.x_box_rand_scale = 0.8
-    params.y_box_rand_scale = 1.25
+    params.x_box_rand_scale = 0.4
+    params.y_box_rand_scale = 0.8
     params.min_box_width = 5
     params.min_box_height = 5
-    params.gt_update_interval = 1000
-    params.lambda_param = 1.75
+    params.gt_update_interval = 9999
+    params.lambda_param = 0.75
 
     return params
