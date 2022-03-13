@@ -52,6 +52,10 @@ class OTBDataset(BaseDataset):
         sequence_info_list = [
             {"name": "Basketball", "path": u"./Basketball/img", "startFrame": 1, "endFrame": 725, "nz": 4, "ext": "jpg",
              "anno_path": u"./Basketball/groundtruth_rect.txt",
+             "object_class": "person"},
+            {"name": "Vase", "path": "Vase/img", "startFrame": 1, "endFrame": 271, "nz": 4, "ext": "jpg", "anno_path": "Vase/groundtruth_rect.txt",
+             "object_class": "other"},
+            {"name": "Singer1", "path": "Singer1/img", "startFrame": 1, "endFrame": 351, "nz": 4, "ext": "jpg", "anno_path": "Singer1/groundtruth_rect.txt",
              "object_class": "person"}
         ]
 
