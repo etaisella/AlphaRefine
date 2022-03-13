@@ -29,7 +29,7 @@ def run_evaluator(tracker_name, tracker_param, dataset_name='otb', sequence=None
     trackers = []
 
     if tracker_name == 'all':
-        trackers.extend(trackerlist('kalmanBased', 'standard', range(0, 5), 'Our Tracker'))
+        trackers.extend(trackerlist('kalmanBased', 'standard_75', range(0, 5), 'Our Tracker'))
         trackers.extend(trackerlist('atom', 'default', range(0, 5), 'ATOM'))
         trackers.extend(trackerlist('dimp', 'super_dimp', range(0, 5), 'SuperDiMP'))
         if refined_path != None:
