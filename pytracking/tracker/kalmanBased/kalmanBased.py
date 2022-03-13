@@ -46,62 +46,6 @@ def compBatDist(p, q):
     sigma_part = np.sum(np.sqrt(p * q)) * 20
     return math.exp(sigma_part)
 
-
-
-def calculateW(I, S, q, centerPoint):
-    N = S.shape[1]
-    W = np.zeros((1, N))
-
-    # calculate weights
-
-    X_boundry = I.shape[1] - 1
-    Y_boundry = I.shape[0] - 1
-
-    # create normalised window
-    bottom_boundry = np.clip(S[1] - S[3], 0, Y_boundry - 1).astype(int)
-    top_boundry = np.clip(S[1] + S[3], 1, Y_boundry).astype(int)
-    left_boundry = np.clip(S[0] - S[2], 0, X_boundry - 1).astype(int)
-    right_boundry = np.clip(S[0] + S[2], 1, X_boundry).astype(int)
-
-    p = np.zeros((N, 4096))
-    for i in range(N):
-        normalised_window = I[bottom_boundry[i]:top_boundry[i],
-                            left_boundry[i]:right_boundry[i],
-                            :]
-
-        normalised_window = np.around(normalised_window * (15 / 255))
-        normalized_window_gray = normalised_window[:, :, 0] + 16 * normalised_window[:, :, 1] + \
-                                 256 * normalised_window[:, :, 2]
-
-        # create histogram
-        q_test = histogram1d(normalized_window_gray.flat, bins=4096, range=(0, 4096))
-        q_test = q_test / np.sum(q_test)
-        p[i] = q_test
-
-    sigma_part = np.sum(np.sqrt(p * q), axis=1) * 10
-    # distance = compBatDist(p, q)
-    W[0] = np.exp(sigma_part)
-
-    # normalise
-    W = W / np.sum(W)
-
-    cp_particles = [S[0], S[1]]
-    cp_estimated = centerPoint
-    dist = (cp_particles[0] - cp_estimated[0])**2 + (cp_particles[1] - cp_estimated[1])**2
-
-    beta = 1.75
-    W2 = np.amax(dist) - dist
-    if np.amin(dist) > 30:
-        print("Distance too big")
-        beta = 0
-
-    W2 = W2 / np.sum(W2)
-
-    W = W + W2 * beta
-    W = W / np.sum(W)
-
-    return W
-
 class kb_tracker(BaseTracker):
 
     def predictParticles(self, S_next_tag):
@@ -134,7 +78,63 @@ class kb_tracker(BaseTracker):
                                                      int(bbox[2]))
         template_tensor = self.transform(template_tensor)
         self.template = template_tensor
+    
+    
+    def calculateW(self, I, S, q, centerPoint):
+        N = S.shape[1]
+        W = np.zeros((1, N))
 
+        # calculate weights
+
+        X_boundry = I.shape[1] - 1
+        Y_boundry = I.shape[0] - 1
+
+        # create normalised window
+        bottom_boundry = np.clip(S[1] - S[3], 0, Y_boundry - 1).astype(int)
+        top_boundry = np.clip(S[1] + S[3], 1, Y_boundry).astype(int)
+        left_boundry = np.clip(S[0] - S[2], 0, X_boundry - 1).astype(int)
+        right_boundry = np.clip(S[0] + S[2], 1, X_boundry).astype(int)
+
+        p = np.zeros((N, 4096))
+        for i in range(N):
+            normalised_window = I[bottom_boundry[i]:top_boundry[i],
+                            left_boundry[i]:right_boundry[i],
+                            :]
+
+            normalised_window = np.around(normalised_window * (15 / 255))
+            normalized_window_gray = normalised_window[:, :, 0] + 16 * normalised_window[:, :, 1] + \
+                                 256 * normalised_window[:, :, 2]
+
+            # create histogram
+            q_test = histogram1d(normalized_window_gray.flat, bins=4096, range=(0, 4096))
+            q_test = q_test / np.sum(q_test)
+            p[i] = q_test
+
+        sigma_part = np.sum(np.sqrt(p * q), axis=1) * 10
+        # distance = compBatDist(p, q)
+        W[0] = np.exp(sigma_part)
+
+        # normalise
+        W = W / np.sum(W)
+
+        cp_particles = [S[0], S[1]]
+        cp_estimated = centerPoint
+        dist = (cp_particles[0] - cp_estimated[0])**2 + (cp_particles[1] - cp_estimated[1])**2
+
+        beta = 1.75
+        W2 = np.amax(dist) - dist
+        if np.amin(dist) > 30:
+            print("Distance too big")
+            beta = 0
+
+        W2 = W2 / np.sum(W2)
+
+        W = W + W2 * self.params.lambda
+        W = W / np.sum(W)
+
+        return W
+    
+    
     def initialize(self, image, info: dict) -> dict:
         self.transform = self.transform = transforms.Compose([transforms.ToTensor(),
                                                               transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -159,7 +159,7 @@ class kb_tracker(BaseTracker):
 
         # initialize histogram and weights
         self.q = compNormHist(image, s_initial)
-        self.W = calculateW(image, self.S, self.q, [init_box[0] + int(init_box[2] / 2), init_box[1] + int(init_box[3] / 2)])
+        self.W = self.calculateW(image, self.S, self.q, [init_box[0] + int(init_box[2] / 2), init_box[1] + int(init_box[3] / 2)])
 
         self.images_processed = 1
 
@@ -170,8 +170,8 @@ class kb_tracker(BaseTracker):
         tic = time.time()
         out = {'time': time.time() - tic}
         return out
-
-
+    
+    
     def track(self, image, info: dict = None) -> dict:
         S_prev = self.S
 
@@ -187,7 +187,7 @@ class kb_tracker(BaseTracker):
         center_point = np.array(center_point.detach().cpu().squeeze()).astype(int)
 
         # compute particle weights
-        self.W = calculateW(image, self.S, self.q, center_point)
+        self.W = self.calculateW(image, self.S, self.q, center_point)
 
         # return agrragated particle
         X_mean = np.sum(np.multiply(self.W, self.S[0, :]))
