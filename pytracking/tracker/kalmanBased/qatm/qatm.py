@@ -16,7 +16,7 @@ from glob import glob
 import copy
 import os
 import sys
-from soft_argmax import SoftArgmax2D
+from tracker.kalmanBased.qatm.soft_argmax import SoftArgmax2D
 from PIL import Image
 
 
