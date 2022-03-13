@@ -121,7 +121,6 @@ class kb_tracker(BaseTracker):
         cp_estimated = centerPoint
         dist = (cp_particles[0] - cp_estimated[0])**2 + (cp_particles[1] - cp_estimated[1])**2
 
-        beta = 1.75
         W2 = np.amax(dist) - dist
         if np.amin(dist) > 30:
             print("Distance too big")
