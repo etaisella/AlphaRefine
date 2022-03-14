@@ -1,3 +1,7 @@
+This is repository forked forked from the official implementation of [Alpha-Refine: Boosting Tracking Performance by Precise Bounding Box Estimation
+](https://arxiv.org/abs/2012.06815).
+It is a work done as part of the final project in the Deep Learning course at Tel-Aviv University by Etai Sella and Or Sagiv.
+
 # Alpha-Refine
 
 This is the official implementation of [Alpha-Refine: Boosting Tracking Performance by Precise Bounding Box Estimation
