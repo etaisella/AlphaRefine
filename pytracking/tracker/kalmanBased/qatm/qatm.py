@@ -247,11 +247,13 @@ class TrackerModel(nn.Module):
     self.softArgmax2d = SoftArgmax2D()
     
   def set_template(self, template):
-    self.T_feat = self.featex(template)
+    template_resized = F.interpolate(template, size=(64, 64))
+    self.T_feat = self.featex(template_resized)
   
   def forward(self, x):
     bs, indim, H, W = x.shape
-    I_feat = self.featex(x)
+    x_resized = F.interpolate(x, size=(256,256))
+    I_feat = self.featex(x_resized)
     I_feat_norm, T_feat_norm = self.normLayer(I_feat, torch.cat(bs*[self.T_feat]))
 
     dist = torch.einsum("xcab,xcde->xabde", I_feat_norm / torch.norm(I_feat_norm, dim=1, keepdim=True), T_feat_norm / torch.norm(T_feat_norm, dim=1, keepdim=True))
